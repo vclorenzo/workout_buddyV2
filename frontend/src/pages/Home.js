@@ -5,37 +5,48 @@ import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
 import { useAuthContext } from '../hooks/useAuthContext';
 
 const Home = () => {
-  const { workouts, dispatch } = useWorkoutsContext();
-  const { user } = useAuthContext();
+	const { workouts, workout, dispatch } = useWorkoutsContext();
+	const { user } = useAuthContext();
 
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      const response = await fetch('/api/workouts', {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const json = await response.json();
-      if (response.ok) {
-        dispatch({ type: 'SET_WORKOUTS', payload: json });
-      }
-    };
+	useEffect(() => {
+		const fetchWorkouts = async () => {
+			const response = await fetch('/api/workouts', {
+				headers: { Authorization: `Bearer ${user.token}` },
+			});
+			const json = await response.json();
+			if (response.ok) {
+				dispatch({ type: 'SET_WORKOUTS', payload: json });
+			}
+		};
 
-    if (user) {
-      fetchWorkouts();
-    }
-  }, [dispatch, user]);
-  return (
-    <div className='home'>
-      <div className='workouts'>
-        {workouts &&
-          workouts.map((workout) => (
-            <WorkoutDetails key={workout._id} workout={workout}>
-              {workout.title}
-            </WorkoutDetails>
-          ))}
-      </div>
-      <WorkoutForm />
-    </div>
-  );
+		if (user) {
+			fetchWorkouts();
+		}
+	}, [dispatch, user]);
+
+	const handleClick = (workout) => {
+		// console.log(`Workout clicked is: ${workout.title}`);
+		dispatch({ type: 'SET_WORKOUT', payload: workout });
+	};
+
+	console.log(workout, workouts);
+	return (
+		<div className="home">
+			<div className="workouts">
+				{workouts &&
+					workouts.map((workout) => (
+						<WorkoutDetails
+							key={workout._id}
+							workout={workout}
+							onClick={() => handleClick(workout)}
+						>
+							{workout.title}
+						</WorkoutDetails>
+					))}
+			</div>
+			<WorkoutForm />
+		</div>
+	);
 };
 
 export default Home;
